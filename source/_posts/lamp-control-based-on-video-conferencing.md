@@ -3,6 +3,7 @@ title: Automatically turning on a lamp when in a video meeting
 date: 2020-07-31 14:15:04
 tags:
   - automation
+  - home-automation
   - macos
 ---
 
