@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="I use an Ecobee 3 Lite as my home thermostat. I have a heat only system (a furnace in the basement) and I only had 3 wires run upto my house (R, W, G). Getting an electrician or HVAC tech to run a wir">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Setting up an ecobee 3 for a heat only system without a native C wire">
+<meta property="og:url" content="https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/index.html">
+<meta property="og:site_name" content="stty.io">
+<meta property="og:description" content="I use an Ecobee 3 Lite as my home thermostat. I have a heat only system (a furnace in the basement) and I only had 3 wires run upto my house (R, W, G). Getting an electrician or HVAC tech to run a wir">
+<meta property="og:locale">
+<meta property="article:published_time" content="2022-07-31T00:46:17.000Z">
+<meta property="article:modified_time" content="2022-07-31T19:39:12.238Z">
+<meta property="article:author" content="Alex">
+<meta property="article:tag" content="homekit">
+<meta property="article:tag" content="home-automation">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Setting up an ecobee 3 for a heat only system without a native C wire</title>
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+      <link rel="alternate" href="/true" title="stty.io" type="application/atom+xml" />
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 6.1.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fas fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fas fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/spaghetti-">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/07/31/sharing-same-accessory-multiple-homes-homekit-homebridge/"><i class="fas fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2021/06/30/self-hosting-personal-infrastructure/"><i class="fas fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fas fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&text=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&is_video=false&description=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Setting up an ecobee 3 for a heat only system without a native C wire&body=Check out this article: https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/"><i class="fas fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&name=Setting up an ecobee 3 for a heat only system without a native C wire&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&t=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    <div id="toc">
+      
+    </div>
+  </span>
+</div>
+
+    
+    <div class="content index py4">
+        
+        <article class="post" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle" itemprop="name headline">
+        Setting up an ecobee 3 for a heat only system without a native C wire
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span itemprop="name">Alex</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2022-07-31T00:46:17.000Z" itemprop="datePublished">2022-07-30</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fas fa-tag"></i>
+        <a class="tag-link-link" href="/tags/home-automation/" rel="tag">home-automation</a>, <a class="tag-link-link" href="/tags/homekit/" rel="tag">homekit</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content" itemprop="articleBody">
+    <p>I use an <a target="_blank" rel="noopener" href="https://www.ecobee.com/en-us/smart-thermostats/smart-wifi-thermostat/">Ecobee 3
+Lite</a> as
+my home thermostat. I have a heat only system (a furnace in the basement) and I
+only had 3 wires run upto my house (R, W, G). Getting an electrician or HVAC
+tech to run a wire up to the house would cost &gt;$150 (at minimum) so I decided
+against that.</p>
+<p>Before the setup, some introductory material as to what the wires do:</p>
+<table>
+<thead>
+<tr>
+<th>Wire</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Rh</td>
+<td>Hot (heating side transformer)</td>
+</tr>
+<tr>
+<td>Rc</td>
+<td>Hot (cooling side transformer)</td>
+</tr>
+<tr>
+<td>C</td>
+<td>Common tap (heating side transformer)</td>
+</tr>
+<tr>
+<td>W(1?)</td>
+<td>Stage 1 heating switch</td>
+</tr>
+<tr>
+<td>W2</td>
+<td>Stage 1 heating switch</td>
+</tr>
+<tr>
+<td>G</td>
+<td>Fan switch</td>
+</tr>
+<tr>
+<td>Y</td>
+<td>AC</td>
+</tr>
+</tbody></table>
+<p>I call them switches because that’s how we can turn on heat&#x2F;the fan&#x2F;AC. If you
+short the Rh wire to W, you’ll find that your furnace turns on, and similarly
+for the fan control. They’re simply relays at the furnace control board. For my
+system, which is a single stage heat only system, I have R, G and W wires.</p>
+<p>The Ecobee 3 and most other smart thermostats require the C wire so that they
+can draw power by completing the R-&gt;C circuit. It turns out that they prefer to
+complete the Rc-&gt;C circuit instead of Rh, which is lucky because you can get a
+random 24VAC transformer off Amazon and provide power to the thermostat this
+way.</p>
+<p>Here’s how you hook it up:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">       ┌────────────┐</span><br><span class="line">       │            │</span><br><span class="line">       │            │</span><br><span class="line">       │    24VAC   │</span><br><span class="line">       │  External  │</span><br><span class="line">       │   Power    │</span><br><span class="line">       │            │</span><br><span class="line">       └──┬─────┬───┘</span><br><span class="line">          │     │</span><br><span class="line">┌─────────┘     └───────────────────┐</span><br><span class="line">│                                   │</span><br><span class="line">│  ┌───────────────────────┐        │</span><br><span class="line">│  │                       │      ┌─┼──┐  R (to furnace)</span><br><span class="line">└──┤Rc                   Rh├──────┘ │  └────</span><br><span class="line">   │                       │        │</span><br><span class="line">   │                       │        │</span><br><span class="line">───┤G     Ecobee3 Lite   C ├────────┘</span><br><span class="line">   │      Baseplate        │</span><br><span class="line">   │                       │              W (to furnace)</span><br><span class="line">───┤Y1                   W1├─────────────────</span><br><span class="line">   │                       │</span><br><span class="line">   │                       │</span><br><span class="line">───┤Y2                   W2├───</span><br><span class="line">   │                       │</span><br><span class="line">   │                       │</span><br><span class="line">───┤O/B                 PEK├───</span><br><span class="line">   └───────────────────────┘</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+<p>I intentionally left out the G wire here because connecting it upto G do
+anything yet. When the thermostat wants to turn on the fan, its internal relay
+will close the circuit from Rc -&gt; G -&gt; C but the furnace requires the circuit Rh
+-&gt; G -&gt; C to be closed. To get around this you can get any 24VAC relay from
+Digi-key or mouser (coil voltage 24VAC, SPST, NO NC 24-240V or anything that you
+can find) for $3. Then we can do this instead:</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">             ┌────────────┐</span><br><span class="line">             │            │</span><br><span class="line">             │            │</span><br><span class="line">             │    24VAC   │</span><br><span class="line">             │  External  │</span><br><span class="line">             │   Power    │</span><br><span class="line">             │            │</span><br><span class="line">             └──┬─────┬───┘</span><br><span class="line">                │     │</span><br><span class="line">      ┌─────────┘     └───────────────────┐</span><br><span class="line">      │                                   │</span><br><span class="line">      │  ┌───────────────────────┐        │</span><br><span class="line">      │  │                       │      ┌─┼──┐  R (to furnace)</span><br><span class="line">      └──┤Rc                   Rh├──────┘ │  ├────</span><br><span class="line">         │                       │        │  │</span><br><span class="line">         │                       │        │  │</span><br><span class="line">┌────────┤G     Ecobee3 Lite   C ├────────┤  └┐</span><br><span class="line">│        │      Baseplate        │        └─┐ │</span><br><span class="line">│        │                       │          │ │ W (to furnace)</span><br><span class="line">│     ───┤Y1                   W1├──────────┼─┼────</span><br><span class="line">│        │                       │          │ │</span><br><span class="line">│        │                       │        ┌─┘ │</span><br><span class="line">│     ───┤Y2                   W2├───     │   │</span><br><span class="line">│        │                       │        │   │</span><br><span class="line">│        │                       │        │   │</span><br><span class="line">│     ───┤O/B                 PEK├───     │   │</span><br><span class="line">│        └───────────────────────┘        │   │</span><br><span class="line">│                                         │   │</span><br><span class="line">│                                         │   │</span><br><span class="line">│                                         │   │</span><br><span class="line">│                                         │   │</span><br><span class="line">│    (G)       ┌───────────────┐ (Rh)     │   │</span><br><span class="line">└──────────────┤ Coil     NC   ├──────────┼───┘</span><br><span class="line">               │     Relay     │          │</span><br><span class="line">               │               │          │          G (to furnance)</span><br><span class="line">               │ Coil     NO   ├──────────┼───────────────</span><br><span class="line">               └───┬───────────┘          │</span><br><span class="line">                   │                      │</span><br><span class="line">                   └──────────────────────┘</span><br><span class="line">                     (C from external power)</span><br></pre></td></tr></table></figure>
+
+<p>Basically, hookup G from the ecobee and the C side of the external power supply
+to the coil of the relay. When the thermostats internal relay latches, power
+will flow from Rc-&gt;G-&gt;Relay-&gt;C. Hookup the G wire from the furnace and the Rh
+wire to NC and NO contacts on the relay. I recommend heat shrinking all contacts
+after soldering for safety.</p>
+<p>Now you can go into the thermostats settings and test each control one by one
+and both your heat and fan should turn on independently.</p>
+<p>Being able to control your thermostat through Homekit besides, the cost of
+setting this up:</p>
+<table>
+<thead>
+<tr>
+<th>Item</th>
+<th>Cost</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Thermostat</td>
+<td>$146.63</td>
+</tr>
+<tr>
+<td>Power supply</td>
+<td>$19.43</td>
+</tr>
+<tr>
+<td>Relay</td>
+<td>$9 (incl shipping)</td>
+</tr>
+<tr>
+<td>PG&amp;E Rebate</td>
+<td>-$120</td>
+</tr>
+<tr>
+<td>Total</td>
+<td>$46.06</td>
+</tr>
+</tbody></table>
+<p>and some wires so about 50 bucks in all. I could have cut down the cost by
+choosing a cheaper power supply and by not paying Digikey $6 to ship a $3
+component, but I wasn’t about to wait 2-3 weeks to get stuff off Aliexpress and
+the like.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+         
+          <li><a href="/">Home</a></li>
+         
+          <li><a href="/archives/">Writing</a></li>
+         
+          <li><a target="_blank" rel="noopener" href="http://github.com/spaghetti-">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    <div id="toc-footer" style="display: none">
+      
+    </div>
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.facebook.com/sharer.php?u=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://twitter.com/share?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&text=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.linkedin.com/shareArticle?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://pinterest.com/pin/create/bookmarklet/?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&is_video=false&description=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Setting up an ecobee 3 for a heat only system without a native C wire&body=Check out this article: https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/"><i class="fas fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://getpocket.com/save?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://reddit.com/submit?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.stumbleupon.com/submit?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://digg.com/submit?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&title=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="http://www.tumblr.com/share/link?url=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&name=Setting up an ecobee 3 for a heat only system without a native C wire&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" target="_blank" rel="noopener" href="https://news.ycombinator.com/submitlink?u=https://stty.io/2022/07/30/ecobee3-heat-only-3-wire-fan-control-c-wire/&t=Setting up an ecobee 3 for a heat only system without a native C wire"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fas fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fas fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fas fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fas fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2022
+    Alex
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a target="_blank" rel="noopener" href="http://github.com/spaghetti-">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+ 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script> 
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script> 
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="far fa-clone"></i>';
+    btn += '</span>'; 
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Google Analytics -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Umami Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
