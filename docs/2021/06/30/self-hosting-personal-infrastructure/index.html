@@ -1,0 +1,361 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="TL;DR: reboot often, don’t self host email, everything behind a vpn Self hosting your own web(?) services is a lot of fun and it can be educational and rewarding at the same time. I’ve been hosting va">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Self hosting your own services">
+<meta property="og:url" content="https://stty.io/2021/06/30/self-hosting-personal-infrastructure/index.html">
+<meta property="og:site_name" content="stty.io">
+<meta property="og:description" content="TL;DR: reboot often, don’t self host email, everything behind a vpn Self hosting your own web(?) services is a lot of fun and it can be educational and rewarding at the same time. I’ve been hosting va">
+<meta property="og:locale">
+<meta property="article:published_time" content="2021-06-30T11:07:28.000Z">
+<meta property="article:modified_time" content="2021-06-30T11:38:55.112Z">
+<meta property="article:author" content="Alex">
+<meta property="article:tag" content="linux">
+<meta property="article:tag" content="web">
+<meta property="article:tag" content="security">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>Self hosting your own services</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="http://github.com/probberechts">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2022/07/31/ecobee3-heat-only-3-wire-fan-control-c-wire/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2020/08/01/lamp-control-based-on-video-conferencing/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&text=Self hosting your own services"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&is_video=false&description=Self hosting your own services"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Self hosting your own services&body=Check out this article: https://stty.io/2021/06/30/self-hosting-personal-infrastructure/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&name=Self hosting your own services&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&t=Self hosting your own services"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+      <div id="toc">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Security"><span class="toc-number">1.</span> <span class="toc-text">Security</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Effort-v-Reward"><span class="toc-number">2.</span> <span class="toc-text">Effort v Reward</span></a></li></ol>
+      </div>
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        Self hosting your own services
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Alex</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2021-06-30T11:07:28.000Z" class="dt-published" itemprop="datePublished">2021-06-30</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/linux/" rel="tag">linux</a>, <a class="p-category" href="/tags/security/" rel="tag">security</a>, <a class="p-category" href="/tags/web/" rel="tag">web</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p><em>TL;DR: reboot often, don’t self host email, everything behind a vpn</em></p>
+<p>Self hosting your own web(?) services is a lot of fun and it can be educational
+and rewarding at the same time. I’ve been hosting various things for over 10
+years (I started with random things like IRC bots) and here’s what I think about
+it:</p>
+<ul>
+<li>Treat servers as cattle, not pets.</li>
+</ul>
+<p>This is really important - chasing uptime was cool at some point, but it’s not
+anymore. Rebooting often catches configuration you may have updated by hand that
+is not persistent, lets you apply updates (I don’t think this should be
+automated, however) etc;</p>
+<ul>
+<li>Do <strong>not</strong> self host critical infra like email.</li>
+</ul>
+<p>If you cannot afford downtime, don’t do it. Even the cheapest mail provider will
+be a better bet than your self hosted solution, for the same amount of
+effort/cost. Even this blog, which is a static web site, is hosted on Github
+pages even though I’ve more than enough servers.</p>
+<ul>
+<li>You don’t need kubernetes. Keep it simple.</li>
+<li>Use Ansible or another something like that to automate provisioning your
+server. It does not matter if you only have a single VPS, a bash script is
+better than editing your configuration by hand and forgetting about it in a few
+days.</li>
+<li>You should ideally also be using ansible to automate cloudflare/registrar
+setup for your domains.</li>
+<li>Monitoring - set up something basic. If n&gt;1 then consider having a
+minimalistic prometheus setup (maybe even without grafana it’s heavier) that you
+can use to debug stuff.</li>
+<li>If you use Docker, be aware that it is <strong>not</strong> secure by default. Use your
+hosting providers software firewall solution if possible or triple check that it
+hasn’t punched any holes/done anything else that’s weird. I use podman, which is
+better than Docker in this regard.</li>
+<li>Don’t trust containers you find on the docker public registry. If its
+critical/hosts your secrets, build it yourself. It’s just writing a Dockerfile,
+its easy.</li>
+<li>If you use AWS/another cloud provider, make sure you have billing alerts set
+up even if you don’t expect to exceed quotas/are on the free tier.</li>
+<li>Backups are important. RAID isn’t a backup. If you’re on dedicated
+server providers like Hetzner you should plan for your disks to fail. It will
+happen to you.</li>
+</ul>
+<h2 id="Security"><a href="#Security" class="headerlink" title="Security"></a>Security</h2><p>Software is buggy/insecure by default. Your (/my) configuration is most probably
+insecure. Self hosting has a huge surface area that can be exploited by anyone
+bored enough to do so.</p>
+<ul>
+<li>Set up sane defaults for SSH and firewalls.</li>
+<li>Preferably host your infrastructure behind a VPN. None of my services are
+accessible over the internet. I use Wireguard to connect all my personal devices
+and all my servers and treat it as a “LAN” of sorts.</li>
+<li>Pin dependencies if possible.</li>
+</ul>
+<h2 id="Effort-v-Reward"><a href="#Effort-v-Reward" class="headerlink" title="Effort v Reward"></a>Effort v Reward</h2><p>Keep it simple. Unless you’re getting paid to do it, this is a hobby. Don’t
+over-complicate things and end up with a second day job. Offload stuff to paid
+services once it becomes critical enough.</p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="http://github.com/probberechts">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+      <div id="toc-footer" style="display: none">
+        <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#Security"><span class="toc-number">1.</span> <span class="toc-text">Security</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#Effort-v-Reward"><span class="toc-number">2.</span> <span class="toc-text">Effort v Reward</span></a></li></ol>
+      </div>
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&text=Self hosting your own services"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&is_video=false&description=Self hosting your own services"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=Self hosting your own services&body=Check out this article: https://stty.io/2021/06/30/self-hosting-personal-infrastructure/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&title=Self hosting your own services"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&name=Self hosting your own services&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://stty.io/2021/06/30/self-hosting-personal-infrastructure/&t=Self hosting your own services"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+          <a id="toc" class="icon" href="#" onclick="$('#toc-footer').toggle();return false;"><i class="fa-solid fa-list fa-lg" aria-hidden="true"></i> TOC</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Alex
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="http://github.com/probberechts">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>

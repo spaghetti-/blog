@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <!-- so meta -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="HandheldFriendly" content="True">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+    <meta name="description" content="ZFS is known to have performance overheads caused by the 16KB read&#x2F;write of random blocks by bittorrent[0]. One way of avoiding this fragmentation is by moving files from a dataset that is made specif">
+<meta property="og:type" content="article">
+<meta property="og:title" content="rtorrent + flood - Moving completed files out to a different directory">
+<meta property="og:url" content="https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/index.html">
+<meta property="og:site_name" content="stty.io">
+<meta property="og:description" content="ZFS is known to have performance overheads caused by the 16KB read&#x2F;write of random blocks by bittorrent[0]. One way of avoiding this fragmentation is by moving files from a dataset that is made specif">
+<meta property="og:locale">
+<meta property="article:published_time" content="2019-12-28T08:24:10.000Z">
+<meta property="article:modified_time" content="2019-12-28T08:29:45.807Z">
+<meta property="article:author" content="Alex">
+<meta property="article:tag" content="zfs">
+<meta property="article:tag" content="rtorrent">
+<meta property="article:tag" content="flood">
+<meta property="article:tag" content="bittorrent">
+<meta name="twitter:card" content="summary">
+    
+    
+      
+        
+          <link rel="shortcut icon" href="/images/favicon.ico">
+        
+      
+      
+        
+          <link rel="icon" type="image/png" href="/images/favicon-192x192.png" sizes="192x192">
+        
+      
+      
+        
+          <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon.png">
+        
+      
+    
+    <!-- title -->
+    <title>rtorrent + flood - Moving completed files out to a different directory</title>
+    <!-- async scripts -->
+    <!-- Google Analytics -->
+
+
+    <!-- Umami Analytics -->
+
+
+    <!-- styles -->
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <!-- persian styles -->
+    
+    <!-- rss -->
+    
+    
+	<!-- mathjax -->
+	
+<meta name="generator" content="Hexo 7.3.0"></head>
+
+<body class="max-width mx-auto px3 ltr">
+    
+      <div id="header-post">
+  <a id="menu-icon" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="menu-icon-tablet" href="#" aria-label="Menu"><i class="fa-solid fa-bars fa-lg"></i></a>
+  <a id="top-icon-tablet" href="#" aria-label="Top" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');" style="display:none;"><i class="fa-solid fa-chevron-up fa-lg"></i></a>
+  <span id="menu">
+    <span id="nav">
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="http://github.com/probberechts">Projects</a></li><!--
+     -->
+      </ul>
+    </span>
+    <br/>
+    <span id="actions">
+      <ul>
+        
+        <li><a class="icon" aria-label="Previous post" href="/2020/08/01/lamp-control-based-on-video-conferencing/"><i class="fa-solid fa-chevron-left" aria-hidden="true" onmouseover="$('#i-prev').toggle();" onmouseout="$('#i-prev').toggle();"></i></a></li>
+        
+        
+        <li><a class="icon" aria-label="Next post" href="/2019/05/13/qemu-vm-wireguard-vpn-tun-tap-networking/"><i class="fa-solid fa-chevron-right" aria-hidden="true" onmouseover="$('#i-next').toggle();" onmouseout="$('#i-next').toggle();"></i></a></li>
+        
+        <li><a class="icon" aria-label="Back to top" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up" aria-hidden="true" onmouseover="$('#i-top').toggle();" onmouseout="$('#i-top').toggle();"></i></a></li>
+        <li><a class="icon" aria-label="Share post" href="#"><i class="fa-solid fa-share-alt" aria-hidden="true" onmouseover="$('#i-share').toggle();" onmouseout="$('#i-share').toggle();" onclick="$('#share').toggle();return false;"></i></a></li>
+      </ul>
+      <span id="i-prev" class="info" style="display:none;">Previous post</span>
+      <span id="i-next" class="info" style="display:none;">Next post</span>
+      <span id="i-top" class="info" style="display:none;">Back to top</span>
+      <span id="i-share" class="info" style="display:none;">Share post</span>
+    </span>
+    <br/>
+    <div id="share" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/"><i class="fab fa-facebook " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&text=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-twitter " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-linkedin " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&is_video=false&description=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-pinterest " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=rtorrent + flood - Moving completed files out to a different directory&body=Check out this article: https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/"><i class="fa-solid fa-envelope " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-get-pocket " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-reddit " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-stumbleupon " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-digg " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&name=rtorrent + flood - Moving completed files out to a different directory&description="><i class="fab fa-tumblr " aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&t=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-hacker-news " aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+    
+    
+  </span>
+</div>
+
+    
+    <div class="content index py4 ">
+        
+        <article class="post h-entry" itemscope itemtype="http://schema.org/BlogPosting">
+  <header>
+    
+    <h1 class="posttitle p-name" itemprop="name headline">
+        rtorrent + flood - Moving completed files out to a different directory
+    </h1>
+
+
+
+    <div class="meta">
+      <span class="author p-author h-card" itemprop="author" itemscope itemtype="http://schema.org/Person">
+        <span class="p-name" itemprop="name">Alex</span>
+      </span>
+      
+    <div class="postdate">
+      
+        <time datetime="2019-12-28T08:24:10.000Z" class="dt-published" itemprop="datePublished">2019-12-28</time>
+        
+      
+    </div>
+
+
+      
+
+      
+    <div class="article-tag">
+        <i class="fa-solid fa-tag"></i>
+        <a class="p-category" href="/tags/bittorrent/" rel="tag">bittorrent</a>, <a class="p-category" href="/tags/flood/" rel="tag">flood</a>, <a class="p-category" href="/tags/rtorrent/" rel="tag">rtorrent</a>, <a class="p-category" href="/tags/zfs/" rel="tag">zfs</a>
+    </div>
+
+
+    </div>
+  </header>
+  
+
+  <div class="content e-content" itemprop="articleBody">
+    <p>ZFS is known to have performance overheads caused by the 16KB read/write of
+random blocks by bittorrent[0]. One way of avoiding this fragmentation is by
+moving files from a dataset that is made specifically for staging to another
+that can hold the files better for sequential I/O (for example, downloading them
+off the server).</p>
+<p>The Arch wiki has a section on this[1] that works for vanilla rtorrent, I
+assume. I manage rtorrent by using flood[2], an excellent web based UI. It does
+not use the watch directories AFAIK so this part</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">schedule2 = watch_directory_1,10,10,&quot;load.start=/home/user/torrents/watch/*.torrent,d.custom1.set=/home/user/torrents/complete&quot;</span><br></pre></td></tr></table></figure>
+<p>is not useful anymore. Instead we can just define the path directly</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">method.insert = d.move_to_complete, simple, &quot;d.directory.set=$argument.1=; execute=mkdir,-p,$argument.1=; execute=mv,-u,$argument.0=,$argument.1=; d.save_full_session=&quot;</span><br><span class="line">method.set_key = event.download.finished,move_complete,&quot;d.move_to_complete=$d.data_path=,/your/path/here/&quot;</span><br></pre></td></tr></table></figure>
+<p>If you are running rtorrent in a container (as I am, an alpine container
+particularly) then <code>mv -u</code> may not work if you’re using the binary provided by
+busybox instead of the one from coreutils that you’re familiar with. Change it
+up</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">method.insert = d.move_to_complete, simple, &quot;d.directory.set=$argument.1=; execute=mkdir,-p,$argument.1=; execute=mv,$argument.0=,$argument.1=; d.save_full_session=&quot;</span><br><span class="line">method.set_key = event.download.finished,move_complete,&quot;d.move_to_complete=$d.data_path=,/your/path/here/&quot;</span><br></pre></td></tr></table></figure>
+<p>[0] <a href="http://open-zfs.org/wiki/Performance_tuning#Bit_Torrent" target="_blank" rel="noopener">http://open-zfs.org/wiki/Performance_tuning#Bit_Torrent</a></p>
+<p>[1] <a href="https://wiki.archlinux.org/index.php/RTorrent#Manage_completed_files" target="_blank" rel="noopener">https://wiki.archlinux.org/index.php/RTorrent#Manage_completed_files</a></p>
+<p>[2] <a href="https://github.com/Flood-UI/flood" target="_blank" rel="noopener">https://github.com/Flood-UI/flood</a></p>
+
+  </div>
+</article>
+
+
+
+        
+          <div id="footer-post-container">
+  <div id="footer-post">
+
+    <div id="nav-footer" style="display: none">
+      <ul>
+        
+          <li><a href="/">Home</a></li>
+        
+          <li><a href="/about/">About</a></li>
+        
+          <li><a href="/archives/">Writing</a></li>
+        
+          <li><a href="http://github.com/probberechts">Projects</a></li>
+        
+      </ul>
+    </div>
+
+    
+    
+
+    <div id="share-footer" style="display: none">
+      <ul>
+  <li><a class="icon" href="http://www.facebook.com/sharer.php?u=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/"><i class="fab fa-facebook fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://twitter.com/share?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&text=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-twitter fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.linkedin.com/shareArticle?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-linkedin fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://pinterest.com/pin/create/bookmarklet/?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&is_video=false&description=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-pinterest fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="mailto:?subject=rtorrent + flood - Moving completed files out to a different directory&body=Check out this article: https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/"><i class="fa-solid fa-envelope fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://getpocket.com/save?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-get-pocket fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://reddit.com/submit?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-reddit fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.stumbleupon.com/submit?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-stumbleupon fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://digg.com/submit?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&title=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-digg fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="http://www.tumblr.com/share/link?url=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&name=rtorrent + flood - Moving completed files out to a different directory&description="><i class="fab fa-tumblr fa-lg" aria-hidden="true"></i></a></li>
+  <li><a class="icon" href="https://news.ycombinator.com/submitlink?u=https://stty.io/2019/12/28/rtorrent-move-on-completion-flood/&t=rtorrent + flood - Moving completed files out to a different directory"><i class="fab fa-hacker-news fa-lg" aria-hidden="true"></i></a></li>
+</ul>
+
+    </div>
+
+    <div id="actions-footer">
+        <a id="menu" class="icon" href="#" onclick="$('#nav-footer').toggle();return false;"><i class="fa-solid fa-bars fa-lg" aria-hidden="true"></i> Menu</a>
+        
+        <a id="share" class="icon" href="#" onclick="$('#share-footer').toggle();return false;"><i class="fa-solid fa-share-alt fa-lg" aria-hidden="true"></i> Share</a>
+        <a id="top" style="display:none" class="icon" href="#" onclick="$('html, body').animate({ scrollTop: 0 }, 'fast');"><i class="fa-solid fa-chevron-up fa-lg" aria-hidden="true"></i> Top</a>
+    </div>
+
+  </div>
+</div>
+
+        
+        <footer id="footer">
+  <div class="footer-left">
+    Copyright &copy;
+    
+    
+    2016-2024
+    Alex
+  </div>
+  <div class="footer-right">
+    <nav>
+      <ul>
+        <!--
+       --><li><a href="/">Home</a></li><!--
+     --><!--
+       --><li><a href="/about/">About</a></li><!--
+     --><!--
+       --><li><a href="/archives/">Writing</a></li><!--
+     --><!--
+       --><li><a href="http://github.com/probberechts">Projects</a></li><!--
+     -->
+      </ul>
+    </nav>
+  </div>
+</footer>
+
+    </div>
+    <!-- styles -->
+
+
+
+  <link rel="preload" as="style" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" crossorigin="anonymous" onload="this.onload=null;this.rel='stylesheet'"/>
+
+
+    <!-- jquery -->
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" crossorigin="anonymous"></script>
+
+
+
+
+<!-- clipboard -->
+
+  
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/clipboard.js/2.0.7/clipboard.min.js" crossorigin="anonymous"></script>
+  
+  <script type="text/javascript">
+  $(function() {
+    // copy-btn HTML
+    var btn = "<span class=\"btn-copy tooltipped tooltipped-sw\" aria-label=\"Copy to clipboard!\">";
+    btn += '<i class="fa-regular fa-clone"></i>';
+    btn += '</span>';
+    // mount it!
+    $(".highlight table").before(btn);
+    var clip = new ClipboardJS('.btn-copy', {
+      text: function(trigger) {
+        return Array.from(trigger.nextElementSibling.querySelectorAll('.code')).reduce((str,it)=>str+it.innerText+'\n','')
+      }
+    });
+    clip.on('success', function(e) {
+      e.trigger.setAttribute('aria-label', "Copied!");
+      e.clearSelection();
+    })
+  })
+  </script>
+
+
+<script src="/js/main.js"></script>
+
+<!-- search -->
+
+<!-- Baidu Analytics -->
+
+<!-- Cloudflare Analytics -->
+
+<!-- Disqus Comments -->
+
+<!-- utterances Comments -->
+
+</body>
+</html>
